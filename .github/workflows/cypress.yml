@@ -1,0 +1,52 @@
+name: Cypress Tests
+on:
+    push:
+        branches: [ main, master ]
+
+jobs:
+    Telnyx_tests:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-node@v2
+              with:
+                   node-version: '14.x'
+                   cache: "npm"
+            - name: Install dependencies
+              run: npm i
+            - name: Run Cypress tests
+              run: npm run cy:run
+
+            - name: Generate Report
+              if: always()
+              run: npm run allure:generate             
+            - name: Publishing Allure artifact to Github Actions
+              uses: actions/upload-artifact@v2
+              if: always()
+              with:
+                  name: allure-report
+                  path: allure-report/
+            - name: Get Allure history
+              uses: actions/checkout@v2
+              if: always()
+              continue-on-error: true
+              with:
+                   ref: gh-pages
+                   path: gh-pages        
+            - name: Test marketplace action
+              uses: simple-elf/allure-report-action@master
+              if: always()
+              id: allure-report
+              with:
+                   allure_results: allure-results
+                   gh_pages: gh-pages
+                   allure_report: allure-report
+                   allure_history: allure-history
+                   keep_reports: 20
+            - name: Deploy report to Github Pages
+              if: always()
+              uses: peaceiris/actions-gh-pages@v2
+              env:
+                   PERSONAL_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                   PUBLISH_BRANCH: gh-pages
+                   PUBLISH_DIR: allure-history
