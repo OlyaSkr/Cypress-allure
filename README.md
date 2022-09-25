@@ -21,9 +21,9 @@ Before using cypress, you need to install node.js, install all the dependencies 
 
 * Clone the repository using "git clone "
 * npm init
-* npm install cypress --save-dev
+* npm i
 * npm run cy:run
-* npm run allure:report 
+* npm run allure:generate
   
 ## Configuration 
 1. cypress.config.js - Main config file where default behavior of Cypress can be modified.
